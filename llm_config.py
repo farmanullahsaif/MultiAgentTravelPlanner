@@ -19,6 +19,9 @@ if not API_KEY:
     except Exception:
         pass
 
+if API_KEY:
+    API_KEY = API_KEY.strip()
+
 if not API_KEY:
     raise ValueError(
         "GROQ_API_KEY is missing. Please set GROQ_API_KEY in .env (locally) or in Streamlit Secrets (on Streamlit Cloud)."
