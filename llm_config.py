@@ -8,19 +8,27 @@ from langchain_groq import ChatGroq
 load_dotenv()
 
 
-# Get Groq API key (check os.getenv first, then streamlit secrets)
-API_KEY = os.getenv("GROQ_API_KEY")
-
-if not API_KEY:
+def get_api_key():
+    # 1. Check Streamlit Secrets first (for Streamlit Cloud)
     try:
         import streamlit as st
-        if "GROQ_API_KEY" in st.secrets:
-            API_KEY = st.secrets["GROQ_API_KEY"]
+        if hasattr(st, "secrets"):
+            if "GROQ_API_KEY" in st.secrets:
+                return str(st.secrets["GROQ_API_KEY"]).strip().strip('"').strip("'")
+            if "groq_api_key" in st.secrets:
+                return str(st.secrets["groq_api_key"]).strip().strip('"').strip("'")
     except Exception:
         pass
 
-if API_KEY:
-    API_KEY = API_KEY.strip()
+    # 2. Check OS environment variables (.env)
+    key = os.getenv("GROQ_API_KEY") or os.getenv("groq_api_key")
+    if key:
+        return str(key).strip().strip('"').strip("'")
+
+    return None
+
+
+API_KEY = get_api_key()
 
 if not API_KEY:
     raise ValueError(
